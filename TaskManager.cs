@@ -80,6 +80,7 @@ namespace TaskManager
 
             nbtasks += 1;
             taskslist.Add(newTask);
+            Console.Clear();
             Console.WriteLine("Task added successfully, Id to show the task it " + nbtasks);
         }
 
@@ -95,6 +96,8 @@ namespace TaskManager
                 Console.WriteLine("Please enter a valid number");
                 return;
             }
+
+            Console.Clear();
 
             TaskItem foundtask = taskslist.Find(x => x.Id == id);
             if (foundtask != null)
@@ -145,12 +148,16 @@ namespace TaskManager
             {
                 taskslist.RemoveAt(deleteid - 1);
                 Console.WriteLine("Task Deleted succefully");
+                Console.Clear();
                 return;
-            } else if (action.Equals("no"))
+            } 
+            else if (action.Equals("no"))
             {
                 Console.WriteLine("Action aborted");
+                Console.Clear();
                 return;
-            } else
+            } 
+            else
             {
                 Console.WriteLine("Invalid Action");
                 return;
@@ -158,12 +165,65 @@ namespace TaskManager
         }
         static void updateTask()
         {
+            bool loop = true;
+            Console.WriteLine("What task would you like to update ?");
+            int id = Convert.ToInt32(Console.ReadLine());
+            TaskItem task = taskslist.Find(x => x.Id == id);
+            
+            if (task == null)
+            {
+                Console.WriteLine("No task found for the Id mentionned");
+                return;
+            }
+            
+            while (loop)
+            {
+                Console.WriteLine("What part of the task would you like to update ?");
+                Console.WriteLine("1. Title");
+                Console.WriteLine("2. Description");
+                Console.WriteLine("3. Due Date");
+                Console.WriteLine("4. Priority");
+                Console.WriteLine("5. Is Completed");
+                Console.WriteLine("6. Exit");
+                int choice = Convert.ToInt32(Console.ReadLine());
 
+                switch (choice)
+                {
+                    case 1:
+                        Console.WriteLine("Enter the new title");
+                        task.Title = Console.ReadLine();
+                        break;
+                    case 2:
+                        Console.WriteLine("Enter the new description");
+                        task.Description = Console.ReadLine();
+                        break;
+                    case 3:
+                        Console.WriteLine("Enter the new due date");
+                        task.DueDate = Convert.ToDateTime(Console.ReadLine());
+                        break;
+                    case 4:
+                        Console.WriteLine("Enter the new priority");
+                        task.Priority = Convert.ToInt32(Console.ReadLine());
+                        break;
+                    case 5:
+                        Console.WriteLine("Enter the new status");
+                        task.IsCompleted = Convert.ToBoolean(Console.ReadLine());
+                        break;
+                    case 6:
+                        loop = false;
+                        Console.Clear();
+                        break;
+                }
+            }
         }
 
         static void savetoJson()
         {
-
+            Console.WriteLine("Saving tasks to JSON...");
+            Thread.Sleep(2000);
+            string jsonString = JsonSerializer.Serialize(taskslist);
+            File.WriteAllText(@"C:\Users\steam deck\source\repos\TaskManager\", jsonString);
+            return;
         }
 
         static void loadFromJson()
