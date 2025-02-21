@@ -30,7 +30,8 @@ namespace TaskManager
                 Console.WriteLine("4. Update Task");
                 Console.WriteLine("5. Save tasks to JSON");
                 Console.WriteLine("6. Load tasks from JSON");
-                Console.WriteLine("7. Exit");
+                Console.WriteLine("7. Clear content of JSON file");
+                Console.WriteLine("8. Exit");
                 Console.WriteLine("Enter your choice: ");
                 int choice = Convert.ToInt32(Console.ReadLine());
                 switch (choice)
@@ -54,6 +55,9 @@ namespace TaskManager
                         loadFromJson();
                         break;
                     case 7:
+                        clearContent();
+                        break;
+                    case 8:
                         loop = false;
                         break;
                 }
@@ -63,7 +67,7 @@ namespace TaskManager
         {
             Console.WriteLine("Name of the task ?");
             String name = Console.ReadLine();
-            Console.WriteLine("Description of task");    
+            Console.WriteLine("Description of task");
             String desc = Console.ReadLine();
             Console.WriteLine("What Priority ? (Number)");
             int prio = Convert.ToInt32(Console.ReadLine());
@@ -91,8 +95,9 @@ namespace TaskManager
             try
             {
                 id = Convert.ToInt32(Console.ReadLine());
-            } catch (FormatException) 
-            { 
+            }
+            catch (FormatException)
+            {
                 Console.WriteLine("Please enter a valid number");
                 return;
             }
@@ -118,9 +123,10 @@ namespace TaskManager
             try
             {
                 deleteid = Convert.ToInt32(Console.ReadLine());
-            } catch (FormatException)
+            }
+            catch (FormatException)
             {
-                Console.WriteLine("Please enter a valid Id"); 
+                Console.WriteLine("Please enter a valid Id");
                 return;
             }
 
@@ -135,13 +141,14 @@ namespace TaskManager
                 Console.WriteLine(find.DueDate);
                 Console.WriteLine(find.Priority);
                 Console.WriteLine(find.IsCompleted);
-            } else
+            }
+            else
             {
                 Console.WriteLine("No tasks for the Id mentionned were found");
                 return;
             }
 
-                Console.WriteLine("Are you sure you want to delete the task ?");
+            Console.WriteLine("Are you sure you want to delete the task ?");
             String action = Console.ReadLine().ToLower().Trim();
 
             if (action.Equals("yes"))
@@ -150,15 +157,16 @@ namespace TaskManager
                 Console.WriteLine("Task Deleted succefully");
                 Console.Clear();
                 return;
-            } 
+            }
             else if (action.Equals("no"))
             {
                 Console.WriteLine("Action aborted");
                 Console.Clear();
                 return;
-            } 
+            }
             else
             {
+                Console.Clear();
                 Console.WriteLine("Invalid Action");
                 return;
             }
@@ -169,13 +177,13 @@ namespace TaskManager
             Console.WriteLine("What task would you like to update ?");
             int id = Convert.ToInt32(Console.ReadLine());
             TaskItem task = taskslist.Find(x => x.Id == id);
-            
+
             if (task == null)
             {
                 Console.WriteLine("No task found for the Id mentionned");
                 return;
             }
-            
+
             while (loop)
             {
                 Console.WriteLine("What part of the task would you like to update ?");
@@ -222,13 +230,49 @@ namespace TaskManager
             Console.WriteLine("Saving tasks to JSON...");
             Thread.Sleep(2000);
             string jsonString = JsonSerializer.Serialize(taskslist);
-            File.WriteAllText(@"C:\Users\steam deck\source\repos\TaskManager\", jsonString);
+            File.WriteAllText(@"tasks.json", jsonString);
             return;
         }
 
         static void loadFromJson()
         {
+            String filepath = "tasks.json";
+            if (File.Exists(filepath))
+            {
+                string jsonString = File.ReadAllText(filepath);
+                taskslist = JsonSerializer.Deserialize<List<TaskItem>>(jsonString);
+                Console.Clear();
+                Console.WriteLine("Tasks loaded from JSON");
+                return;
+            }
+            else
+            {
+                Console.WriteLine("No tasks found in the JSON file");
+                return;
+            }
+        }
 
+        static void clearContent()
+        {
+            String filepath = "tasks.json";
+            if (File.Exists(filepath))
+            {
+                Console.WriteLine("Are you sure you want to clear the content of the file ?");
+                String action = Console.ReadLine().ToLower().Trim();
+                if (action == "yes")
+                {
+                    File.WriteAllText(filepath, string.Empty);
+                    Console.Clear();
+                    Console.WriteLine("Content cleared");
+                    return;
+                } 
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Action aborted");
+                    return;
+                }
+            }
         }
     }
 }
